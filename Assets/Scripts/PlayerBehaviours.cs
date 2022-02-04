@@ -12,8 +12,8 @@ public class PlayerBehaviours : MonoBehaviour
     [SerializeField] private float gravity;
     [SerializeField] private float originalStepOffset;
 
-    [SerializeField] private Transform box;
-    [SerializeField] private Transform hand;
+    [SerializeField] private  Interactable box;
+    public Vector3 dir_box;
 
     private HUDBehaviour scriptHud;
     enum StatusPlayer {Walk, DragBox };
@@ -31,45 +31,51 @@ public class PlayerBehaviours : MonoBehaviour
     void Update()
     {
 
-        RaycastHit hit;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(ray, out hit, 10f))
+        switch (GetStatusPlayer())
         {
-            Interactable interactable = hit.collider.GetComponent<Interactable>();
-            if (interactable != null)
-            {
-                if (scriptHud.CheckCurrentInteractable())
-                {
-                    scriptHud.UpdateInteractable(interactable.objectTag);
-                }
+            case StatusPlayer.Walk:
 
+
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                if (Physics.Raycast(ray, out hit, 10f))
+                {
+                    Interactable interactable = hit.collider.GetComponent<Interactable>();
+                    if (interactable != null)
+                    {
+                        if (scriptHud.CheckCurrentInteractable())
+                        {
+                            scriptHud.UpdateInteractable(interactable.objectTag);
+                        }
+
+                        if (Input.GetMouseButtonDown(0))
+                        {
+                            SetStatusPlayer(StatusPlayer.DragBox);
+                            box = hit.collider.gameObject.GetComponent<Interactable>();
+                            SetSpeed(0.5f);
+                            transform.LookAt(box.gameObject.transform.position);
+                            box.Interact();
+
+                        }
+                    }
+
+                }
+                else
+                {
+                    scriptHud.UpdateInteractable("");
+                }
+                break;
+            case StatusPlayer.DragBox:
                 if (Input.GetMouseButtonDown(0))
                 {
-                    if (box == null)
-                    {
-                        SetStatusPlayer(StatusPlayer.DragBox);
-                        box = hit.collider.transform;
-                        transform.LookAt(box.position);
-                        box.position = hand.position;
-                        box.parent = gameObject.transform;
-                        SetSpeed(0.5f);
-                    }
-                    else
-                    {
-                        SetStatusPlayer(StatusPlayer.Walk);
-                        box.transform.parent = null;
-                        SetSpeed(6);
-                        box = null;
-                    }
+                    SetStatusPlayer(StatusPlayer.Walk);
+                    box.Interact();
+                    SetSpeed(6);
                 }
-            }
+                break;
+        }
 
-        }
-        else
-        {
-            scriptHud.UpdateInteractable("");
-        }
 
     }
 
@@ -81,15 +87,19 @@ public class PlayerBehaviours : MonoBehaviour
     // movimentação e pulo
     private void Move()
     {
+
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
         Vector3 movementDirection = new Vector3(x, 0, z);
 
-        
+        if (GetStatusPlayer() == StatusPlayer.DragBox)
+        {
+            movementDirection = dir_box;
+        }
+
         float magnitude = Mathf.Clamp01(movementDirection.magnitude) * speed;
-        //movementDirection = Quaternion.AngleAxis(cameraTransform.rotation.eulerAngles.y, Vector3.up) * movementDirection;
+        movementDirection = Quaternion.AngleAxis(cameraTransform.rotation.eulerAngles.y, Vector3.up) * movementDirection;
         movementDirection.Normalize();
-        //Debug.Log(movementDirection);
         gravity += Physics.gravity.y * Time.deltaTime;
 
         if (controller.isGrounded && GetStatusPlayer() == StatusPlayer.Walk)
@@ -123,12 +133,6 @@ public class PlayerBehaviours : MonoBehaviour
         
     }
 
-    void FaceTarget()
-    {
-        Vector3 direction = (box.position - transform.position).normalized;
-        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x,0f,direction.z));
-        transform.rotation = Quaternion.Slerp(transform.rotation,lookRotation,Time.deltaTime * 5f);
-    }
 
 
     private void SetStatusPlayer(StatusPlayer status)
@@ -144,5 +148,10 @@ public class PlayerBehaviours : MonoBehaviour
     private void SetSpeed(float value)
     {
         speed = value;
+    }
+
+    public void SetDir_Box(Vector3 new_Dir_Box)
+    {
+        dir_box = new_Dir_Box;
     }
 }
