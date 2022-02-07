@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class GameManeger : MonoBehaviour
 {
     private int score = 0;
-    private HUDBehaviour scriptHud;
+    public HUDBehaviour scriptHud;
     public static GameManeger instance;
     private void OnLevelWasLoaded(int level)
     {

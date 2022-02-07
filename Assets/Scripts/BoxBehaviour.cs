@@ -21,9 +21,6 @@ public class BoxBehaviour :Interactable
         if (player == null)
         {
             player = GameObject.FindGameObjectWithTag("Player");
-            Vector3 teste = (transform.position - player.transform.position).normalized;
-            player.GetComponent<PlayerBehaviours>().SetDir_Box(new Vector3(Mathf.Round(teste.x), Mathf.Round(teste.y), Mathf.Round(teste.z)));
-            Debug.Log((Mathf.Round(teste.x) + " / " + Mathf.Round(teste.y) + " / " + Mathf.Round(teste.z)));
             transform.parent = player.transform;
         }
         else

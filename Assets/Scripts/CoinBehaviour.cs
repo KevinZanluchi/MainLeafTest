@@ -11,6 +11,7 @@ public class CoinBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        scriptManeger = GameObject.Find("GameManeger").GetComponent<GameManeger>();
         score = coin.score;
         rend.material.SetTexture("_MainTex", coin.texture);
     }

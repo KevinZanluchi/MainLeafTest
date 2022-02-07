@@ -13,7 +13,6 @@ public class PlayerBehaviours : MonoBehaviour
     [SerializeField] private float originalStepOffset;
 
     [SerializeField] private  Interactable box;
-    public Vector3 dir_box;
 
     private HUDBehaviour scriptHud;
     enum StatusPlayer {Walk, DragBox };
@@ -90,12 +89,7 @@ public class PlayerBehaviours : MonoBehaviour
 
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
-        Vector3 movementDirection = new Vector3(x, 0, z);
-
-        if (GetStatusPlayer() == StatusPlayer.DragBox)
-        {
-            movementDirection = dir_box;
-        }
+        Vector3 movementDirection = GetDirectionMove(x,z);
 
         float magnitude = Mathf.Clamp01(movementDirection.magnitude) * speed;
         movementDirection = Quaternion.AngleAxis(cameraTransform.rotation.eulerAngles.y, Vector3.up) * movementDirection;
@@ -133,7 +127,20 @@ public class PlayerBehaviours : MonoBehaviour
         
     }
 
+    private Vector3 GetDirectionMove(float x, float z)
+    {
+        Vector3 direction;
 
+        if (GetStatusPlayer() == StatusPlayer.DragBox)
+        {
+            direction = new Vector3(0, 0, z);
+        }
+        else
+        {
+            direction = new Vector3(x, 0, z);
+        }
+        return direction;
+    }
 
     private void SetStatusPlayer(StatusPlayer status)
     {
@@ -148,10 +155,5 @@ public class PlayerBehaviours : MonoBehaviour
     private void SetSpeed(float value)
     {
         speed = value;
-    }
-
-    public void SetDir_Box(Vector3 new_Dir_Box)
-    {
-        dir_box = new_Dir_Box;
     }
 }
