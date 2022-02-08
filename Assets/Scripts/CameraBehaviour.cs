@@ -62,12 +62,15 @@ public class CameraBehaviour : MonoBehaviour
 
     public void SetAreaFocus(Transform newArea)
     {
+        targets.Add(newArea);
+    }
 
+    public void RemoveAreaFocus()
+    {
         if (targets.Count != 1)
         {
             targets.RemoveAt(targets.Count - 1);
         }
-        targets.Add(newArea);
     }
 
     float GetGreatestDistance()

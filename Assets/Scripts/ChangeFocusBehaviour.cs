@@ -16,4 +16,12 @@ public class ChangeFocusBehaviour : MonoBehaviour
             scriptCam.SetAreaFocus(areaFocus);
         }
     }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            scriptCam.RemoveAreaFocus();
+        }
+    }
 }
