@@ -7,7 +7,14 @@ public class GameManeger : MonoBehaviour
 {
     private int score = 0;
     public HUDBehaviour scriptHud;
+
+    [SerializeField] private List<Transform> boxs;
+    public List<float> box1;
+    public List<float> box2;
+    private bool gameOver = false;
+
     public static GameManeger instance;
+
     private void OnLevelWasLoaded(int level)
     {
 
@@ -34,7 +41,51 @@ public class GameManeger : MonoBehaviour
 
     private void StarGame()
     {
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            boxs = GameObject.Find("Reference").GetComponent<SaveReferenceScene>().GetBoxs();
+            if (gameOver)
+            {
+                Load();
+                gameOver = false;
+            }
+        }
         scriptHud = GameObject.Find("HUD").GetComponent<HUDBehaviour>();
+    }
+
+    private void Save()
+    {
+        GetBoxsTransforms(box1,boxs[0]);
+        GetBoxsTransforms(box2, boxs[1]);
+        Save_Load.Save(this);
+    }
+
+    private void Load()
+    {
+        SaveConfig data = Save_Load.Load();
+
+        if (data != null)
+        {
+            SetBoxPosition(data.box1, boxs[0]);
+            SetBoxPosition(data.box2, boxs[1]);
+        }
+        else
+        {
+            Debug.Log("Error");
+        }
+    }
+
+    private void GetBoxsTransforms(List<float> box, Transform boxPosition)
+    {
+        box[0] = boxPosition.position.x;
+        box[1] = boxPosition.position.y;
+        box[2] = boxPosition.position.z;
+
+    }
+
+    private void SetBoxPosition(List<float> box, Transform boxPosition)
+    {
+        boxPosition.position = new Vector3(box[0],box[1],box[2]);
     }
 
     public void Score(int scoreCoin)
@@ -50,11 +101,17 @@ public class GameManeger : MonoBehaviour
 
     public void EndFase(int fase)
     {
+        if (SceneManager.GetActiveScene().buildIndex  == 0)
+        {
+            Save();
+        }
         SceneManager.LoadScene(fase);
     }
 
     public void GameOver()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        gameOver = true;
+        Score(-score);
+        SceneManager.LoadScene(0);
     }
 }

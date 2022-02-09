@@ -43,17 +43,6 @@ public class GuardBehaviour : MonoBehaviour
             case StatusGuard.Follow:
                 transform.LookAt(new Vector3(GameObject.FindGameObjectWithTag("Player").transform.position.x,0.62f, GameObject.FindGameObjectWithTag("Player").transform.position.z));
 
-                //RaycastHit hit;
-                //if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, 5f))
-                //{
-                //    Debug.Log(hit.distance + " / " + hit.collider.name);
-                //    if (hit.collider.gameObject.tag == "Player")
-                //    {
-                //        Debug.Log("gameOver");
-                //        //GameObject.Find("GameManeger").GetComponent<GameManeger>().GameOver();
-                //    }
-                //}
-
                 StartCoroutine(StartCountdown(false));
                 SetStatusGuard(StatusGuard.Guard);
                 break;
@@ -62,16 +51,6 @@ public class GuardBehaviour : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        //if (other.gameObject.tag == "Player")
-        //{
-
-        //    SetStatusGuard(StatusGuard.Follow);
-        //    agent.isStopped = true;
-        //}
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
         if (other.gameObject.tag == "Player")
         {
             RaycastHit hit;
@@ -79,8 +58,7 @@ public class GuardBehaviour : MonoBehaviour
             {
                 if (hit.transform.tag == "Player")
                 {
-                    Debug.Log("gameOver");
-                    //GameObject.Find("GameManeger").GetComponent<GameManeger>().GameOver();
+                    GameObject.Find("GameManeger").GetComponent<GameManeger>().GameOver();
                 }
                 Debug.DrawLine(transform.position, new Vector3(playerTransform.position.x, 0.6f, playerTransform.position.z), Color.red);
             }
@@ -89,21 +67,29 @@ public class GuardBehaviour : MonoBehaviour
                 Debug.DrawLine(transform.position, new Vector3(playerTransform.position.x, 0.6f, playerTransform.position.z), Color.yellow);
             }
 
-            //Ray ray = new Ray(transform.position,(other.gameObject.transform.position - transform.position).normalized);
-            //RaycastHit hit;
-            //if (Physics.Raycast(ray, out hit, 5f))
-            //{
-            //    //Debug.Log(hit.distance + " / " + hit.collider.name);
-            //    if (hit.collider.gameObject.tag == "Player")
-            //    {
-            //        Debug.Log("gameOver");
-            //        //GameObject.Find("GameManeger").GetComponent<GameManeger>().GameOver();
-            //    }
-            //    Debug.DrawRay(transform.position, (other.gameObject.transform.position - transform.position).normalized * hit.distance, Color.red);
-            //}
-
         }
     }
+
+    //private void OnTriggerStay(Collider other)
+    //{
+    //    if (other.gameObject.tag == "Player")
+    //    {
+    //        RaycastHit hit;
+    //        if (Physics.Linecast(transform.position, new Vector3(playerTransform.position.x, 0.6f, playerTransform.position.z), out hit, layerMask))
+    //        {
+    //            if (hit.transform.tag == "Player")
+    //            {
+    //                GameObject.Find("GameManeger").GetComponent<GameManeger>().GameOver();
+    //            }
+    //            Debug.DrawLine(transform.position, new Vector3(playerTransform.position.x, 0.6f, playerTransform.position.z), Color.red);
+    //        }
+    //        else
+    //        {
+    //            Debug.DrawLine(transform.position, new Vector3(playerTransform.position.x, 0.6f, playerTransform.position.z), Color.yellow);
+    //        }
+
+    //    }
+    //}
 
     public IEnumerator StartCountdown(bool teste)
     {
