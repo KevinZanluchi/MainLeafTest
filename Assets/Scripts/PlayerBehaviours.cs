@@ -12,6 +12,8 @@ public class PlayerBehaviours : MonoBehaviour
     [SerializeField] private float gravity;
     [SerializeField] private float originalStepOffset;
 
+    [SerializeField] private Animator anim;
+
     [SerializeField] private  Interactable box;
 
     private HUDBehaviour scriptHud;
@@ -70,7 +72,7 @@ public class PlayerBehaviours : MonoBehaviour
                 {
                     SetStatusPlayer(StatusPlayer.Walk);
                     box.Interact();
-                    SetSpeed(6);
+                    SetSpeed(3);
                 }
                 break;
         }
@@ -81,6 +83,8 @@ public class PlayerBehaviours : MonoBehaviour
     private void LateUpdate()
     {
         Move();
+        Jump();
+        Crunch();
     }
 
     // movimentação e pulo
@@ -92,24 +96,12 @@ public class PlayerBehaviours : MonoBehaviour
         Vector3 movementDirection = GetDirectionMove(x,z);
 
         float magnitude = Mathf.Clamp01(movementDirection.magnitude) * speed;
+
+        anim.SetFloat("Move", magnitude);
+
         movementDirection = Quaternion.AngleAxis(cameraTransform.rotation.eulerAngles.y, Vector3.up) * movementDirection;
         movementDirection.Normalize();
         gravity += Physics.gravity.y * Time.deltaTime;
-
-        if (controller.isGrounded && GetStatusPlayer() == StatusPlayer.Walk)
-        {
-            controller.stepOffset = originalStepOffset;
-            gravity = -0.5f;
-
-            if (Input.GetButtonDown("Jump"))
-            {
-                gravity = jumpSpeed;
-            }
-        }
-        else
-        {
-            controller.stepOffset = 0;
-        }
 
         Vector3 move = movementDirection * magnitude;
         move.y = gravity;
@@ -125,6 +117,43 @@ public class PlayerBehaviours : MonoBehaviour
         }
 
         
+    }
+
+    private void Jump()
+    {
+
+        if (controller.isGrounded && GetStatusPlayer() == StatusPlayer.Walk)
+        {
+            anim.SetBool("Jump", false);
+            controller.stepOffset = originalStepOffset;
+            gravity = -0.5f;
+
+            if (Input.GetButtonDown("Jump"))
+            {
+                gravity = jumpSpeed;
+                anim.SetBool("Jump", true);
+            }
+        }
+        else
+        {
+            controller.stepOffset = 0;
+        }
+    }
+
+    private void Crunch()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            anim.SetBool("Crunch", true);
+            controller.center = new Vector3(0,0.4f,0);
+            controller.height = 1;
+        }
+        else if (Input.GetKeyUp(KeyCode.C))
+        {
+            anim.SetBool("Crunch", false);
+            controller.center = new Vector3(0, 0.8f, 0);
+            controller.height = 1.6f;
+        }
     }
 
     private Vector3 GetDirectionMove(float x, float z)
