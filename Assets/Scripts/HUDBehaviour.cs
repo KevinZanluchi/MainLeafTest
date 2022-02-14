@@ -21,9 +21,9 @@ public class HUDBehaviour : MonoBehaviour
         interactableText.text = newInteractable;
     }
 
-    public bool CheckCurrentInteractable()
+    public bool CheckCurrentInteractable(string tag)
     {
-        if (interactableText.text == "")
+        if (interactableText.text == "" && interactableText.text != tag)
         {
             return true;
         }

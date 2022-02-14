@@ -16,7 +16,6 @@ public class BoxBehaviour :Interactable
     public override void Interact()
     {
         base.Interact();
-        //GameObject player = null;
 
         if (player == null)
         {

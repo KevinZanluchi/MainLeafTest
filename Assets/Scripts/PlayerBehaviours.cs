@@ -16,75 +16,28 @@ public class PlayerBehaviours : MonoBehaviour
 
     [SerializeField] private  Interactable box;
 
-    private HUDBehaviour scriptHud;
-    enum StatusPlayer {Walk, DragBox };
+    enum StatusPlayer {Walk, DragBox, Crunch };
 
     StatusPlayer currentStatus;
 
     // Start is called before the first frame update
     void Start()
     {
-        scriptHud = GameObject.Find("HUD").GetComponent<HUDBehaviour>();
+
         SetStatusPlayer(StatusPlayer.Walk);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
 
-        switch (GetStatusPlayer())
-        {
-            case StatusPlayer.Walk:
-
-
-                RaycastHit hit;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                if (Physics.Raycast(ray, out hit, 10f))
-                {
-                    Interactable interactable = hit.collider.GetComponent<Interactable>();
-                    if (interactable != null)
-                    {
-                        if (scriptHud.CheckCurrentInteractable())
-                        {
-                            scriptHud.UpdateInteractable(interactable.objectTag);
-                        }
-
-                        if (Input.GetMouseButtonDown(0))
-                        {
-                            SetStatusPlayer(StatusPlayer.DragBox);
-                            box = hit.collider.gameObject.GetComponent<Interactable>();
-                            SetSpeed(0.5f);
-                            transform.LookAt(box.gameObject.transform.position);
-                            box.Interact();
-
-                        }
-                    }
-
-                }
-                else
-                {
-                    scriptHud.UpdateInteractable("");
-                }
-                break;
-            case StatusPlayer.DragBox:
-                if (Input.GetMouseButtonDown(0))
-                {
-                    SetStatusPlayer(StatusPlayer.Walk);
-                    box.Interact();
-                    SetSpeed(3);
-                }
-                break;
-        }
-
-
-    }
 
     private void LateUpdate()
     {
+
         Move();
-        Jump();
-        Crunch();
+        if (GetStatusPlayer() != StatusPlayer.DragBox)
+        {
+            Jump();
+            Crunch();
+        }
     }
 
     // movimentação e pulo
@@ -94,10 +47,12 @@ public class PlayerBehaviours : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
         Vector3 movementDirection = GetDirectionMove(x,z);
-
         float magnitude = Mathf.Clamp01(movementDirection.magnitude) * speed;
 
-        anim.SetFloat("Move", magnitude);
+        if (GetStatusPlayer() != StatusPlayer.DragBox)
+        {
+            anim.SetFloat("Move", magnitude);
+        }
 
         movementDirection = Quaternion.AngleAxis(cameraTransform.rotation.eulerAngles.y, Vector3.up) * movementDirection;
         movementDirection.Normalize();
@@ -105,24 +60,23 @@ public class PlayerBehaviours : MonoBehaviour
 
         Vector3 move = movementDirection * magnitude;
         move.y = gravity;
-
         controller.Move(move * Time.deltaTime);
 
 
-        if (movementDirection != Vector3.zero && GetStatusPlayer() == StatusPlayer.Walk)
+        if (movementDirection != Vector3.zero && GetStatusPlayer() != StatusPlayer.DragBox)
         {
             Quaternion toRotation = Quaternion.LookRotation(movementDirection, Vector3.up);
 
             transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, 720 * Time.deltaTime);
         }
 
-        
+
     }
 
     private void Jump()
     {
 
-        if (controller.isGrounded && GetStatusPlayer() == StatusPlayer.Walk)
+        if (controller.isGrounded)
         {
             anim.SetBool("Jump", false);
             controller.stepOffset = originalStepOffset;
@@ -144,15 +98,36 @@ public class PlayerBehaviours : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
+            SetStatusPlayer(StatusPlayer.Crunch);
             anim.SetBool("Crunch", true);
             controller.center = new Vector3(0,0.4f,0);
             controller.height = 1;
         }
         else if (Input.GetKeyUp(KeyCode.C))
         {
+            SetStatusPlayer(StatusPlayer.Walk);
             anim.SetBool("Crunch", false);
             controller.center = new Vector3(0, 0.8f, 0);
             controller.height = 1.6f;
+        }
+    }
+
+    public void Interactable(GameObject hit)
+    {
+        switch (GetStatusPlayer())
+        {
+            case StatusPlayer.Walk:
+
+                SetStatusPlayer(StatusPlayer.DragBox);
+                box = hit.GetComponent<Interactable>();
+                SetSpeed(0.5f);
+                transform.LookAt(box.gameObject.transform.position);
+                break;
+
+            case StatusPlayer.DragBox:
+                SetStatusPlayer(StatusPlayer.Walk);
+                SetSpeed(3);
+                break;
         }
     }
 
