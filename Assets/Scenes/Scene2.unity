@@ -1527,8 +1527,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9500000, guid: b235179bd2a63d1468dd430670338c55, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 6093b0acf2cfdeb4fa1bb90d86df1882, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b235179bd2a63d1468dd430670338c55, type: 3}
+--- !u!95 &390854013 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9500000, guid: b235179bd2a63d1468dd430670338c55,
+    type: 3}
+  m_PrefabInstance: {fileID: 390854012}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &412511015
 GameObject:
   m_ObjectHideFlags: 0
@@ -4223,7 +4233,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d6fc33cddfa24b4aa68baafb5806799, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scriptHud: {fileID: 0}
+  boxs: []
+  box1: []
+  box2: []
 --- !u!4 &1463767206
 Transform:
   m_ObjectHideFlags: 0
@@ -4387,11 +4399,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 1557444552}
-  speed: 6
+  speed: 3
   cameraTransform: {fileID: 963194228}
   jumpSpeed: 6
   gravity: 0
   originalStepOffset: 1
+  anim: {fileID: 390854013}
   box: {fileID: 0}
 --- !u!4 &1557444551 stripped
 Transform:

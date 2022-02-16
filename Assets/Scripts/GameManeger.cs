@@ -6,7 +6,8 @@ using UnityEngine.SceneManagement;
 public class GameManeger : MonoBehaviour
 {
     private int score = 0;
-    public HUDBehaviour scriptHud;
+    [SerializeField] private HUDBehaviour scriptHud;
+    [SerializeField] private LevelLoaderBehaviour scriptLevelLoader;
 
     [SerializeField] private List<Transform> boxs;
     public List<float> box1;
@@ -51,6 +52,7 @@ public class GameManeger : MonoBehaviour
             }
         }
         scriptHud = GameObject.Find("HUD").GetComponent<HUDBehaviour>();
+        scriptLevelLoader = GameObject.Find("HUD").GetComponent<LevelLoaderBehaviour>();
     }
 
     private void Save()
@@ -105,13 +107,15 @@ public class GameManeger : MonoBehaviour
         {
             Save();
         }
-        SceneManager.LoadScene(fase);
+        scriptLevelLoader.LoadLevel(fase);
+        //SceneManager.LoadScene(fase);
     }
 
     public void GameOver()
     {
         gameOver = true;
         Score(-score);
-        SceneManager.LoadScene(0);
+        scriptLevelLoader.LoadLevel(0);
+        //SceneManager.LoadScene(0);
     }
 }
